@@ -7,36 +7,10 @@ import CustomizeImg from '../assets/images/Customize.jpg';
 function HeroSection() {
     return (
         <div className='hero-container'>
-
+            <h1>BREAKING SAD</h1>
+            <p>The unofficial Breaking Bad App/Website</p>
             <div className='hero-btns'>
-                <Button
-                className='btns'
-                buttonStyle='btn--outline'
-                buttonSize='btn--large'
-                >
-                CHARACTERS
-                </Button>
-                <Button
-                className='btns'
-                buttonStyle='btn--outline'
-                buttonSize='btn--large'
-                >
-                EPISODES
-                </Button>
-                <Button
-                className='btns'
-                buttonStyle='btn--outline'
-                buttonSize='btn--large'
-                >
-                QUOTES
-                </Button>
-                <Button
-                className='btns'
-                buttonStyle='btn--outline'
-                buttonSize='btn--large'
-                >
-                CUSTOMIZE
-                </Button>
+                
             </div>
         </div>
     )
