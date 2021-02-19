@@ -1,6 +1,13 @@
 import React from 'react'
 import CardItem from './CardItem'
 import '../assets/css/Cards.css'
+import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
+
+import Characters from '../components/pages/Characters';
+import Episodes from '../components/pages/Episodes';
+import Quotes from '../components/pages/Quotes';
+import Customize from '../components/pages/Customize';
+
 import CharacterImg from '../assets/images/Characters.jpg';
 import EpisodesImg from '../assets/images/Episodes.jpg';
 import QuotesImg from '../assets/images/Quotes.jpg';
