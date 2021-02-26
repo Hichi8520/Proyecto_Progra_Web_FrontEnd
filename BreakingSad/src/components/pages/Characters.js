@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import '../../assets/css/App.css'
+import '../../assets/css/Characters.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 import { Link } from 'react-router-dom';
 
 function Characters() {
 
-    
-    
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -15,6 +13,7 @@ function Characters() {
             if (localStorage.getItem('characters')) {
                 setData(JSON.parse(localStorage.getItem('characters')))
             }
+            
         }
         readCharacters()
     }, []);
@@ -54,12 +53,15 @@ function Characters() {
             character.portrayed=selectedCharacter.portrayed;
           }
         });
+        localStorage.setItem('characters', JSON.stringify(dataNueva))
         setData(dataNueva);
         setModalEdit(false);
     }
 
     const deleted =()=>{
-        setData(data.filter(character=>character.id!==selectedCharacter.id));
+        const filteredData = data.filter(character=>character.id!==selectedCharacter.id);
+        localStorage.setItem('characters', JSON.stringify(filteredData))
+        setData(filteredData);
         setModalDelete(false);
     }
 
@@ -70,7 +72,13 @@ function Characters() {
 
     const insert =()=>{
         var valueInsert=selectedCharacter;
-        valueInsert.id=data[data.length-1].id+1;
+        if (data.length===0) {
+            valueInsert.id=1;
+        }
+        else {
+            valueInsert.id=data[data.length-1].id+1;
+        }
+        
         var newData = data;
         newData.push(valueInsert);
         localStorage.setItem('characters', JSON.stringify(newData))
@@ -79,13 +87,13 @@ function Characters() {
     }
 
     return (
-        <div className="Characters">
+        <div className="characters">
             <h2>Characters</h2>
             <br/>
             <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insert</button>
             <br/><br/>
-            <table className="table table-responsive">
-                <thead>
+            <table className="table table-responsive-sm table-striped table-bordered table-hover">
+                <thead className="thead-dark">
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
