@@ -6,6 +6,7 @@ import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import Home from './components/pages/Home';
 import Search from './components/pages/Search';
 import User from './components/pages/User';
+import Login from './components/pages/Login';
 import SignUp from './components/pages/SignUp';
 import Characters from './components/pages/Characters';
 import Episodes from './components/pages/Episodes';
@@ -21,7 +22,7 @@ function App() {
         <Route path='/' exact component={Home}/>
         <Route path='/search' component={Search} />
         <Route path='/user' component={User} />
-        <Route path='/sign-up' component={SignUp} />
+        <Route path='/login' component={Login} />
         <Route path='/characters' component={Characters} />
         <Route path='/episodes' component={Episodes} />
         <Route path='/quotes' component={Quotes} />

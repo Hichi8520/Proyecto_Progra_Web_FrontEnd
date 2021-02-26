@@ -1,20 +1,24 @@
-import React, {useState} from 'react'
+import React, { useState, useEffect } from 'react'
 import '../../assets/css/App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
-
+import { Link } from 'react-router-dom';
 
 function Characters() {
 
-    const dataCharacters =[
-        {id:1, name:"Walter White", nickname:"Heisenberg", occupation:"Chemistry Teacher", portrayed:"Brian Cranston"},
-        {id:2, name:"Jesse Pinkman", nickname:"Cap n' Cook", occupation:"Meth Dealer", portrayed:"Aaron Paul"},
-        {id:3, name:"Henry Schrader", nickname:"Hank", occupation:"DEA Agent", portrayed:"Dean Norris"},
-        {id:4, name:"Skyler White", nickname:"Sky", occupation:"House wife", portrayed:"Anna Gunn"},
-        {id:5, name:"Walter White Jr.", nickname:"Flynn", occupation:"Teenager", portrayed:"RJ Mitte"},
-    ];
     
-    const [data, setData] = useState(dataCharacters);
+    
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const readCharacters = () => {
+            if (localStorage.getItem('characters')) {
+                setData(JSON.parse(localStorage.getItem('characters')))
+            }
+        }
+        readCharacters()
+    }, []);
+
     const [modalEdit, setModalEdit] = useState(false);
     const [modalDelete, setModalDelete] = useState(false);
     const [modalInsert, setModalInsert] = useState(false);
@@ -25,7 +29,7 @@ function Characters() {
         nickname: '',
         occupation: '',
         portrayed: ''
-      });
+    });
 
     const chooseCharacter=(elemento, caso)=>{
         setSelectedCharacter(elemento);
@@ -35,8 +39,8 @@ function Characters() {
     const handleChange=e=>{
         const {name, value}=e.target;
         setSelectedCharacter((prevState)=>({
-          ...prevState,
-          [name]: value
+        ...prevState,
+        [name]: value
         }));
     }
 
@@ -69,6 +73,7 @@ function Characters() {
         valueInsert.id=data[data.length-1].id+1;
         var newData = data;
         newData.push(valueInsert);
+        localStorage.setItem('characters', JSON.stringify(newData))
         setData(newData);
         setModalInsert(false);
     }
@@ -79,7 +84,7 @@ function Characters() {
             <br/>
             <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insert</button>
             <br/><br/>
-            <table className="table table-bordered">
+            <table className="table table-responsive">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -93,7 +98,9 @@ function Characters() {
                     {data.map(elemento=>(
                         <tr>
                             <td>{elemento.id}</td>
-                            <td>{elemento.name}</td>
+                            <td><Link to={"/characters/"+elemento.name} className='disabled'>
+                            {elemento.name}
+                            </Link></td>
                             <td>{elemento.nickname}</td>
                             <td>{elemento.occupation}</td>
                             <td>{elemento.portrayed}</td>
@@ -203,7 +210,7 @@ function Characters() {
                             <input
                             className="form-control"
                             type="text"
-                            name="nombre"
+                            name="name"
                             value={selectedCharacter ? selectedCharacter.name: ''}
                             onChange={handleChange}
                             />

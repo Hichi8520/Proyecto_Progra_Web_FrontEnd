@@ -8,7 +8,7 @@
   .home,
   .search,
   .user,
-  .sign-up,
+  .login,
   .characters,
   .episodes,
   .quotes,
@@ -26,7 +26,7 @@
     background-size: cover;
     background-repeat: no-repeat;
     color: #fff;
-    font-size: 100px;
+    font-size: 50px;
   }
   
   .user {
@@ -38,7 +38,7 @@
     font-size: 100px;
   }
   
-  .sign-up {
+  .login {
     background-image: url('../images/Episodes.jpg');
     background-position: center;
     background-size: cover;
