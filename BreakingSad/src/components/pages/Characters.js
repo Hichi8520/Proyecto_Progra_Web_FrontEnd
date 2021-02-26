@@ -87,19 +87,18 @@ function Characters() {
     }
 
     return (
-        <div className="characters">
+        <div className="characters-container">
             <h2>Characters</h2>
-            <br/>
             <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insert</button>
-            <br/><br/>
-            <table className="table table-responsive-sm table-striped table-bordered table-hover">
+            <div className="table-container">
+            <table className="table table-responsive table-dark table-striped table-bordered table-hover">
                 <thead className="thead-dark">
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
-                        <th>Nickname</th>
-                        <th>Occupation</th>
-                        <th>Portrayed</th>
+                        <th>NAME</th>
+                        <th>NICKNAME</th>
+                        <th>OCCUPATION</th>
+                        <th>PORTRAYED</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -121,6 +120,7 @@ function Characters() {
                     }
                 </tbody>
             </table>
+            </div>
 
             <Modal isOpen={modalEdit}>
                 <ModalHeader>

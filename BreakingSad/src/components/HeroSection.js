@@ -3,11 +3,13 @@ import '../assets/css/App.css';
 import { Button } from './Button';
 import '../assets/css/HeroSection.css'
 import CustomizeImg from '../assets/images/Customize.jpg';
+import logo from '../assets/images/Logo Breaking Sad.png'
 
 function HeroSection() {
     return (
         <div className='hero-container'>
-            <h1>BREAKING SAD</h1>
+
+            <img src={logo} alt="Logo"/>
             <p>The unofficial Breaking Bad App/Website</p>
             <div className='hero-btns'>
                 

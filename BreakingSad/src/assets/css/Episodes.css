@@ -1,4 +1,4 @@
-.characters {
+.episodes {
     background: linear-gradient(90deg, rgb(131, 131, 131) 0%, rgb(255, 255, 255) 100%);
     display: flex;
     justify-content: center;
@@ -9,8 +9,8 @@
     z-index: 999;
   }
   
-  .characters-container {
-    background: url('../images/Customize_back.jpg') center center/cover no-repeat;
+  .episodes-container {
+    background: url('../images/Episodes_back.jpg') center center/cover no-repeat;
     height: 100vh;
     width: 100%;
     display: flex;
@@ -21,13 +21,13 @@
     object-fit: contain;
   }
 
-  .characters-container > h2 {
+  .episodes-container > h2 {
     color: #fff;
     font-size: 50px;
     margin-top: -100px;
   }
 
-  .characters-container > button {
+  .episodes-container > button {
     margin-top: 0px;
     margin: 30px;
     align-items: left;
