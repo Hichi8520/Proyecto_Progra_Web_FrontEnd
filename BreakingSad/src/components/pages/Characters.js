@@ -1,210 +1,153 @@
-import React, { useState, useEffect } from 'react'
+import React, { Component } from 'react'
 import '../../assets/css/Characters.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
+import { Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import axios from "axios";
 
-function Characters() {
+const url = 'http://localhost:9000/api/v1/characters/';
 
-    const [data, setData] = useState([]);
+class Characters extends Component {
 
-    useEffect(() => {
-        const readCharacters = () => {
-            if (localStorage.getItem('characters')) {
-                setData(JSON.parse(localStorage.getItem('characters')))
-            }
-            
-        }
-        readCharacters()
-    }, []);
-
-    const [modalEdit, setModalEdit] = useState(false);
-    const [modalDelete, setModalDelete] = useState(false);
-    const [modalInsert, setModalInsert] = useState(false);
-
-    const [selectedCharacter, setSelectedCharacter] = useState({
-        id: '',
+state = {
+    data:[],
+    modalInsert: false,
+    modalDelete: false,
+    form:{
+        _id: '',
         name: '',
         nickname: '',
         occupation: '',
         portrayed: ''
-    });
+    }
+}
 
-    const chooseCharacter=(elemento, caso)=>{
-        setSelectedCharacter(elemento);
-        (caso==='Edit')?setModalEdit(true):setModalDelete(true)
+getPetition=()=>{
+    axios.get(url).then(response=>{
+        this.setState({data: response.data});
+    }).catch(error=>{
+        console.log(error.message);
+    })
+}
+
+postPetition=async()=>{
+    delete this.state.form._id;
+    await axios.post(url,this.state.form).then(response=>{
+        this.modalInsert();
+        this.getPetition();
+    }).catch(error=>{
+        console.log(error.message);
+    })
+}
+
+putPetition=()=>{
+    axios.patch(url+this.state.form._id, this.state.form).then(response=>{
+        this.modalInsert();
+        this.getPetition();
+    }).catch(error=>{
+        console.log(error.message);
+    })
+}
+
+deletePetition=()=>{
+    axios.delete(url+this.state.form._id).then(response=>{
+        this.setState({modalDelete: false});
+        this.getPetition();
+    }).catch(error=>{
+        console.log(error.message);
+    })
+}
+
+componentDidMount() {
+    this.getPetition();
+}
+
+    chooseCharacter=(elemento)=>{
+        this.setState({
+            modalType: 'edit',
+            form: {
+                _id: elemento._id,
+                name: elemento.name,
+                nickname: elemento.nickname,
+                occupation: elemento.occupation,
+                portrayed: elemento.portrayed,
+                modalType: ''
+            }
+        })
     }
 
-    const handleChange=e=>{
-        const {name, value}=e.target;
-        setSelectedCharacter((prevState)=>({
-        ...prevState,
-        [name]: value
-        }));
-    }
-
-    const edit=()=>{
-        var dataNueva=data;
-        dataNueva.map(character=>{
-          if(character.id===selectedCharacter.id){
-            character.name=selectedCharacter.name;
-            character.nickname=selectedCharacter.nickname;
-            character.occupation=selectedCharacter.occupation;
-            character.portrayed=selectedCharacter.portrayed;
-          }
+    handleChange=async e=>{
+        e.persist();
+        await this.setState({
+            form:{
+                ...this.state.form,
+                [e.target.name]: e.target.value
+            }
         });
-        localStorage.setItem('characters', JSON.stringify(dataNueva))
-        setData(dataNueva);
-        setModalEdit(false);
+        console.log(this.state.form);
     }
 
-    const deleted =()=>{
-        const filteredData = data.filter(character=>character.id!==selectedCharacter.id);
-        localStorage.setItem('characters', JSON.stringify(filteredData))
-        setData(filteredData);
-        setModalDelete(false);
+    modalInsert=()=>{
+        this.setState({modalInsert: !this.state.modalInsert});
     }
 
-    const abrirModalInsertar=()=>{
-        setSelectedCharacter(null);
-        setModalInsert(true);
-    }
-
-    const insert =()=>{
-        var valueInsert=selectedCharacter;
-        if (data.length===0) {
-            valueInsert.id=1;
-        }
-        else {
-            valueInsert.id=data[data.length-1].id+1;
-        }
-        
-        var newData = data;
-        newData.push(valueInsert);
-        localStorage.setItem('characters', JSON.stringify(newData))
-        setData(newData);
-        setModalInsert(false);
-    }
-
+    render(){
+        const {form}=this.state;
     return (
         <div className="characters-container">
             <h2>Characters</h2>
-            <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insert</button>
+            <button className="btn btn-success" onClick={() => {this.setState({form: null, modalType: 'insert'}); this.modalInsert()}}>Insert</button>
             <div className="table-container">
-            <table className="table table-responsive table-dark table-striped table-bordered table-hover">
-                <thead className="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>NAME</th>
-                        <th>NICKNAME</th>
-                        <th>OCCUPATION</th>
-                        <th>PORTRAYED</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map(elemento=>(
+                <table className="table table-responsive table-dark table-striped table-bordered table-hover">
+                    <thead className="thead-dark">
                         <tr>
-                            <td>{elemento.id}</td>
-                            <td><Link to={"/characters/"+elemento.name} className='disabled'>
-                            {elemento.name}
-                            </Link></td>
-                            <td>{elemento.nickname}</td>
-                            <td>{elemento.occupation}</td>
-                            <td>{elemento.portrayed}</td>
-                            <td>
-                                <button className="btn btn-primary" onClick={()=>chooseCharacter(elemento, 'Edit')}><i className='far fa-edit'/></button> {"   "}
-                                <button className="btn btn-danger" onClick={()=>chooseCharacter(elemento, 'Delete')}><i className='far fa-trash-alt'/></button>
-                            </td>
+
+                            <th>NAME</th>
+                            <th>NICKNAME</th>
+                            <th>OCCUPATION</th>
+                            <th>PORTRAYED</th>
                         </tr>
-                    ))
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {this.state.data.map(elemento => {
+                            return(
+                            <tr>
+
+                                <td><Link to={"/characters/" + elemento.name} className='disabled'>
+                                    {elemento.name}
+                                </Link></td>
+                                <td>{elemento.nickname}</td>
+                                <td>{elemento.occupation}</td>
+                                <td>{elemento.portrayed}</td>
+                                <td>
+                                    <button className="btn btn-primary" onClick={() => {this.chooseCharacter(elemento); this.modalInsert()}}><i className='far fa-edit' /></button> {"   "}
+                                    <button className="btn btn-danger" onClick={() => {this.chooseCharacter(elemento); this.setState({modalDelete: true})}}><i className='far fa-trash-alt' /></button>
+                                </td>
+                            </tr>
+                            )
+                        })
+                        }
+                    </tbody>
+                </table>
             </div>
 
-            <Modal isOpen={modalEdit}>
-                <ModalHeader>
-                <div>
-                    <h3>Edit Character</h3>
-                </div>
-                </ModalHeader>
+
+            <Modal isOpen={this.state.modalDelete}>
                 <ModalBody>
-                    <div className="form-group">
-
-                        <label>Name</label>
-                        <input
-                        className="form-control"
-                        type="text"
-                        name="name"
-                        value={selectedCharacter && selectedCharacter.name}
-                        onChange={handleChange}
-                        />
-                        <br />
-
-                        <label>Nickname</label>
-                        <input
-                        className="form-control"
-                        type="text"
-                        name="nickname"
-                        value={selectedCharacter && selectedCharacter.nickname}
-                        onChange={handleChange}
-                        />
-                        <br />
-
-                        <label>Occupation</label>
-                        <input
-                        className="form-control"
-                        type="text"
-                        name="occupation"
-                        value={selectedCharacter && selectedCharacter.occupation}
-                        onChange={handleChange}
-                        />
-                        <br />
-
-                        <label>Portrayed</label>
-                        <input
-                        className="form-control"
-                        type="text"
-                        name="portrayed"
-                        value={selectedCharacter && selectedCharacter.portrayed}
-                        onChange={handleChange}
-                        />
-                        <br />
-                    </div>
+                    Are you sure you want to delete {form && form.name}?
                 </ModalBody>
                 <ModalFooter>
-                    <button className="btn btn-primary" onClick={()=>edit()}>
-                        Save Changes
-                    </button>
-                    <button
-                        className="btn btn-danger"
-                        onClick={()=>setModalEdit(false)}
-                    >
-                        Cancel
-                    </button>
-                </ModalFooter>
-            </Modal>
-
-
-            <Modal isOpen={modalDelete}>
-                <ModalBody>
-                Are you sure you want to delete {selectedCharacter && selectedCharacter.name}?
-                </ModalBody>
-                <ModalFooter>
-                <button className="btn btn-danger" onClick={()=>deleted()}>
-                    Yes
+                    <button className="btn btn-danger" onClick={() => this.deletePetition()}>
+                        Yes
                 </button>
-                <button
-                    className="btn btn-secondary"
-                    onClick={()=>setModalDelete(false)}
-                >
-                    No
+                    <button className="btn btn-secondary" onClick={() => this.setState({modalDelete: false})}>
+                        No
                 </button>
                 </ModalFooter>
             </Modal>
 
 
-            <Modal isOpen={modalInsert}>
+            <Modal isOpen={this.state.modalInsert}>
                 <ModalHeader>
                     <div>
                         <h3>Insert new Character</h3>
@@ -215,61 +158,65 @@ function Characters() {
 
 
                         <label>Name</label>
-                            <input
+                        <input
                             className="form-control"
                             type="text"
                             name="name"
-                            value={selectedCharacter ? selectedCharacter.name: ''}
-                            onChange={handleChange}
-                            />
+                            value={form?form.name: ''}
+                            onChange={this.handleChange}
+                        />
                         <br />
 
                         <label>Nickname</label>
-                            <input
+                        <input
                             className="form-control"
                             type="text"
                             name="nickname"
-                            value={selectedCharacter ? selectedCharacter.nickname: ''}
-                            onChange={handleChange}
-                            />
+                            value={form?form.nickname: ''}
+                            onChange={this.handleChange}
+                        />
                         <br />
 
                         <label>Occupation</label>
-                            <input
+                        <input
                             className="form-control"
                             type="text"
                             name="occupation"
-                            value={selectedCharacter ? selectedCharacter.occupation: ''}
-                            onChange={handleChange}
-                            />
+                            value={form?form.occupation: ''}
+                            onChange={this.handleChange}
+                        />
                         <br />
 
                         <label>Portrayed by</label>
-                            <input
+                        <input
                             className="form-control"
                             type="text"
                             name="portrayed"
-                            value={selectedCharacter ? selectedCharacter.portrayed: ''}
-                            onChange={handleChange}
-                            />
+                            value={form?form.portrayed: ''}
+                            onChange={this.handleChange}
+                        />
                         <br />
                     </div>
                 </ModalBody>
                 <ModalFooter>
-                    <button className="btn btn-primary"
-                    onClick={()=>insert()}>
-                        Insert
+                    {this.state.modalType == 'insert' ?
+                        <button className="btn btn-primary" onClick={() => this.postPetition()}>
+                            Insert
+                    </button> : <button className="btn btn-primary" onClick={() => this.putPetition()}>
+                            Edit
                     </button>
-                <button
-                    className="btn btn-danger"
-                    onClick={()=>setModalInsert(false)}
-                >
-                    Cancel
+                    }
+                    <button
+                        className="btn btn-danger"
+                        onClick={() => this.modalInsert()}
+                    >
+                        Cancel
                 </button>
                 </ModalFooter>
             </Modal>
         </div>
-    )
+    );
+    }
 }
 
 export default Characters;

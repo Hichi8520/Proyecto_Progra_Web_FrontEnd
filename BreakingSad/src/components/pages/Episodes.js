@@ -1,210 +1,153 @@
-import React, { useState, useEffect } from 'react'
+import React, { Component } from 'react'
 import '../../assets/css/Episodes.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
+import { Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import axios from "axios";
 
-function Episodes() {
+const url = 'http://localhost:9000/api/v1/episodes/';
 
-    const [data, setData] = useState([]);
+class Episodes extends Component {
 
-    useEffect(() => {
-        const readEpisodes = () => {
-            if (localStorage.getItem('episodes')) {
-                setData(JSON.parse(localStorage.getItem('episodes')))
-            }
-            
-        }
-        readEpisodes()
-    }, []);
-
-    const [modalEdit, setModalEdit] = useState(false);
-    const [modalDelete, setModalDelete] = useState(false);
-    const [modalInsert, setModalInsert] = useState(false);
-
-    const [selectedEpisode, setSelectedEpisode] = useState({
-        id: '',
+state = {
+    data:[],
+    modalInsert: false,
+    modalDelete: false,
+    form:{
+        _id: '',
         title: '',
         season: '',
         episode: '',
         air_date: ''
-    });
+    }
+}
 
-    const chooseEpisode=(elemento, caso)=>{
-        setSelectedEpisode(elemento);
-        (caso==='Edit')?setModalEdit(true):setModalDelete(true)
+getPetition=()=>{
+    axios.get(url).then(response=>{
+        this.setState({data: response.data});
+    }).catch(error=>{
+        console.log(error.message);
+    })
+}
+
+postPetition=async()=>{
+    delete this.state.form._id;
+    await axios.post(url,this.state.form).then(response=>{
+        this.modalInsert();
+        this.getPetition();
+    }).catch(error=>{
+        console.log(error.message);
+    })
+}
+
+putPetition=()=>{
+    axios.patch(url+this.state.form._id, this.state.form).then(response=>{
+        this.modalInsert();
+        this.getPetition();
+    }).catch(error=>{
+        console.log(error.message);
+    })
+}
+
+deletePetition=()=>{
+    axios.delete(url+this.state.form._id).then(response=>{
+        this.setState({modalDelete: false});
+        this.getPetition();
+    }).catch(error=>{
+        console.log(error.message);
+    })
+}
+
+componentDidMount() {
+    this.getPetition();
+}
+
+    chooseEpisode=(elemento)=>{
+        this.setState({
+            modalType: 'edit',
+            form: {
+                _id: elemento._id,
+                title: elemento.title,
+                season: elemento.season,
+                episode: elemento.episode,
+                air_date: elemento.air_date,
+                modalType: ''
+            }
+        })
     }
 
-    const handleChange=e=>{
-        const {name, value}=e.target;
-        setSelectedEpisode((prevState)=>({
-        ...prevState,
-        [name]: value
-        }));
-    }
-
-    const edit=()=>{
-        var dataNueva=data;
-        dataNueva.map(episode=>{
-          if(episode.id===selectedEpisode.id){
-            episode.title=selectedEpisode.title;
-            episode.season=selectedEpisode.season;
-            episode.episode=selectedEpisode.episode;
-            episode.air_date=selectedEpisode.air_date;
-          }
+    handleChange=async e=>{
+        e.persist();
+        await this.setState({
+            form:{
+                ...this.state.form,
+                [e.target.name]: e.target.value
+            }
         });
-        localStorage.setItem('episodes', JSON.stringify(dataNueva))
-        setData(dataNueva);
-        setModalEdit(false);
+        console.log(this.state.form);
     }
 
-    const deleted =()=>{
-        const filteredData = data.filter(episode=>episode.id!==selectedEpisode.id);
-        localStorage.setItem('episodes', JSON.stringify(filteredData))
-        setData(filteredData);
-        setModalDelete(false);
+    modalInsert=()=>{
+        this.setState({modalInsert: !this.state.modalInsert});
     }
 
-    const abrirModalInsertar=()=>{
-        setSelectedEpisode(null);
-        setModalInsert(true);
-    }
-
-    const insert =()=>{
-        var valueInsert=selectedEpisode;
-        if (data.length===0) {
-            valueInsert.id=1;
-        }
-        else {
-            valueInsert.id=data[data.length-1].id+1;
-        }
-        
-        var newData = data;
-        newData.push(valueInsert);
-        localStorage.setItem('episodes', JSON.stringify(newData))
-        setData(newData);
-        setModalInsert(false);
-    }
-
+    render(){
+        const {form}=this.state;
     return (
         <div className="episodes-container">
             <h2>Episodes</h2>
-            <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insert</button>
+            <button className="btn btn-success" onClick={() => {this.setState({form: null, modalType: 'insert'}); this.modalInsert()}}>Insert</button>
             <div className="table-container">
-            <table className="table table-responsive table-dark table-striped table-bordered table-hover">
-                <thead className="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>TITLE</th>
-                        <th>SEASON</th>
-                        <th>EPISODE</th>
-                        <th>AIR DATE</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map(elemento=>(
+                <table className="table table-responsive table-dark table-striped table-bordered table-hover">
+                    <thead className="thead-dark">
                         <tr>
-                            <td>{elemento.id}</td>
-                            <td><Link to={"/episodes/"+elemento.title} className='disabled'>
-                            {elemento.title}
-                            </Link></td>
-                            <td>{elemento.season}</td>
-                            <td>{elemento.episode}</td>
-                            <td>{elemento.air_date}</td>
-                            <td>
-                                <button className="btn btn-primary" onClick={()=>chooseEpisode(elemento, 'Edit')}><i className='far fa-edit'/></button> {"   "}
-                                <button className="btn btn-danger" onClick={()=>chooseEpisode(elemento, 'Delete')}><i className='far fa-trash-alt'/></button>
-                            </td>
+
+                            <th>TITLE</th>
+                            <th>SEASON</th>
+                            <th>EPISODE</th>
+                            <th>AIR_DATE</th>
                         </tr>
-                    ))
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {this.state.data.map(elemento => {
+                            return(
+                            <tr>
+
+                                <td><Link to={"/episodes/" + elemento.title} className='disabled'>
+                                    {elemento.title}
+                                </Link></td>
+                                <td>{elemento.season}</td>
+                                <td>{elemento.episode}</td>
+                                <td>{elemento.air_date}</td>
+                                <td>
+                                    <button className="btn btn-primary" onClick={() => {this.chooseEpisode(elemento); this.modalInsert()}}><i className='far fa-edit' /></button> {"   "}
+                                    <button className="btn btn-danger" onClick={() => {this.chooseEpisode(elemento); this.setState({modalDelete: true})}}><i className='far fa-trash-alt' /></button>
+                                </td>
+                            </tr>
+                            )
+                        })
+                        }
+                    </tbody>
+                </table>
             </div>
 
-            <Modal isOpen={modalEdit}>
-                <ModalHeader>
-                <div>
-                    <h3>Edit Episode</h3>
-                </div>
-                </ModalHeader>
+
+            <Modal isOpen={this.state.modalDelete}>
                 <ModalBody>
-                    <div className="form-group">
-
-                        <label>Title</label>
-                        <input
-                        className="form-control"
-                        type="text"
-                        name="title"
-                        value={selectedEpisode && selectedEpisode.title}
-                        onChange={handleChange}
-                        />
-                        <br />
-
-                        <label>Season</label>
-                        <input
-                        className="form-control"
-                        type="text"
-                        name="season"
-                        value={selectedEpisode && selectedEpisode.season}
-                        onChange={handleChange}
-                        />
-                        <br />
-
-                        <label>Episode</label>
-                        <input
-                        className="form-control"
-                        type="text"
-                        name="episode"
-                        value={selectedEpisode && selectedEpisode.episode}
-                        onChange={handleChange}
-                        />
-                        <br />
-
-                        <label>Air Date</label>
-                        <input
-                        className="form-control"
-                        type="text"
-                        name="air_date"
-                        value={selectedEpisode && selectedEpisode.air_date}
-                        onChange={handleChange}
-                        />
-                        <br />
-                    </div>
+                    Are you sure you want to delete {form && form.title}?
                 </ModalBody>
                 <ModalFooter>
-                    <button className="btn btn-primary" onClick={()=>edit()}>
-                        Save Changes
-                    </button>
-                    <button
-                        className="btn btn-danger"
-                        onClick={()=>setModalEdit(false)}
-                    >
-                        Cancel
-                    </button>
-                </ModalFooter>
-            </Modal>
-
-
-            <Modal isOpen={modalDelete}>
-                <ModalBody>
-                Are you sure you want to delete {selectedEpisode && selectedEpisode.title}?
-                </ModalBody>
-                <ModalFooter>
-                <button className="btn btn-danger" onClick={()=>deleted()}>
-                    Yes
+                    <button className="btn btn-danger" onClick={() => this.deletePetition()}>
+                        Yes
                 </button>
-                <button
-                    className="btn btn-secondary"
-                    onClick={()=>setModalDelete(false)}
-                >
-                    No
+                    <button className="btn btn-secondary" onClick={() => this.setState({modalDelete: false})}>
+                        No
                 </button>
                 </ModalFooter>
             </Modal>
 
 
-            <Modal isOpen={modalInsert}>
+            <Modal isOpen={this.state.modalInsert}>
                 <ModalHeader>
                     <div>
                         <h3>Insert new Episode</h3>
@@ -215,61 +158,65 @@ function Episodes() {
 
 
                         <label>Title</label>
-                            <input
+                        <input
                             className="form-control"
                             type="text"
                             name="title"
-                            value={selectedEpisode ? selectedEpisode.title: ''}
-                            onChange={handleChange}
-                            />
+                            value={form?form.title: ''}
+                            onChange={this.handleChange}
+                        />
                         <br />
 
                         <label>Season</label>
-                            <input
+                        <input
                             className="form-control"
                             type="text"
                             name="season"
-                            value={selectedEpisode ? selectedEpisode.season: ''}
-                            onChange={handleChange}
-                            />
+                            value={form?form.season: ''}
+                            onChange={this.handleChange}
+                        />
                         <br />
 
                         <label>Episode</label>
-                            <input
+                        <input
                             className="form-control"
                             type="text"
                             name="episode"
-                            value={selectedEpisode ? selectedEpisode.episode: ''}
-                            onChange={handleChange}
-                            />
+                            value={form?form.episode: ''}
+                            onChange={this.handleChange}
+                        />
                         <br />
 
                         <label>Air Date</label>
-                            <input
+                        <input
                             className="form-control"
                             type="text"
                             name="air_date"
-                            value={selectedEpisode ? selectedEpisode.air_date: ''}
-                            onChange={handleChange}
-                            />
+                            value={form?form.air_date: ''}
+                            onChange={this.handleChange}
+                        />
                         <br />
                     </div>
                 </ModalBody>
                 <ModalFooter>
-                    <button className="btn btn-primary"
-                    onClick={()=>insert()}>
-                        Insert
+                    {this.state.modalType == 'insert' ?
+                        <button className="btn btn-primary" onClick={() => this.postPetition()}>
+                            Insert
+                    </button> : <button className="btn btn-primary" onClick={() => this.putPetition()}>
+                            Edit
                     </button>
-                <button
-                    className="btn btn-danger"
-                    onClick={()=>setModalInsert(false)}
-                >
-                    Cancel
+                    }
+                    <button
+                        className="btn btn-danger"
+                        onClick={() => this.modalInsert()}
+                    >
+                        Cancel
                 </button>
                 </ModalFooter>
             </Modal>
         </div>
-    )
+    );
+    }
 }
 
 export default Episodes;
