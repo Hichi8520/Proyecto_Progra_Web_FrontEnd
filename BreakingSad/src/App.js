@@ -19,10 +19,10 @@ function App() {
     <Router>
       <Navbar/>
       <Switch>
-        <Route path='/' exact component={Home}/>
+        <Route path='/login' component={Login}/>
+        <Route path='/' exact component={Home} />
         <Route path='/search' component={Search} />
         <Route path='/user' component={User} />
-        <Route path='/login' component={Login} />
         <Route path='/characters' component={Characters} />
         <Route path='/episodes' component={Episodes} />
         <Route path='/quotes' component={Quotes} />
