@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom';
 import { Button } from './Button';
 import '../assets/css/Navbar.css';
 import Cookies from 'universal-cookie';
+import LoginComponent from '../components/LoginComponent';
 
 const cookies = new Cookies();
 
@@ -13,16 +14,8 @@ function Navbar() {
     const handleClick = () => setClick(!click);
     const closeMobileMenu = () => setClick(false);
 
-    // const logOut=()=>{
-    //     cookies.remove('id', {path: "/"});
-    //     cookies.remove('first_name', {path: "/"});
-    //     cookies.remove('last_name', {path: "/"});
-    //     cookies.remove('username', {path: "/"});
-    //     window.location.href='./';
-    // }
-
     const showButton = () => {
-        if(window.innerWidth <= 960) {
+        if (window.innerWidth <= 960) {
             setButton(false);
         } else {
             setButton(true);
@@ -39,15 +32,15 @@ function Navbar() {
         <>
             <nav className="navbar">
                 <div className="navbar-container">
-                    <Link to='/' className='navbar-logo' onClick={closeMobileMenu}>
-                        Breaking Sad <i className='fas fa-flask'/>
+                    <Link to='/home' className='navbar-logo' onClick={closeMobileMenu}>
+                        Breaking Sad <i className='fas fa-flask' />
                     </Link>
                     <div className='menu-icon' onClick={handleClick}>
                         <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
                     </div>
                     <ul className={click ? 'nav-menu active' : 'nav-menu'}>
                         <li className='nav-item'>
-                            <Link to='/' className='nav-links' onClick={closeMobileMenu}>
+                            <Link to='/home' className='nav-links' onClick={closeMobileMenu}>
                                 Home
                             </Link>
                         </li>
@@ -62,7 +55,9 @@ function Navbar() {
                             </Link>
                         </li>
                     </ul>
-                    {button && <Button buttonStyle='btn--outline'>Log Out</Button>}
+                    {/* <Link to='/'>
+                        <LoginComponent/>
+                    </Link> */}
                 </div>
             </nav>
         </>
