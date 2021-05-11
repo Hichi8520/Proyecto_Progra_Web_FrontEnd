@@ -9,7 +9,7 @@ const Search = (props) => {
   const [charList, setCharList] = useState();
 
   const fetchData = async () => {
-    return await fetch('http://localhost:9000/api/v1/characters/')
+    return await fetch('EC2Co-EcsEl-INPEKZ3J0RAW-876262990.us-east-2.elb.amazonaws.com:9000/api/v1/characters/')
       .then(response => response.json())
       .then(data => {
         setCharList(data) 

@@ -5,7 +5,7 @@ import { Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import axios from "axios";
 
-const url = 'http://localhost:9000/api/v1/episodes/';
+const url = 'http://ec2co-ecsel-1sdmja9tx78h6-1970409881.us-east-2.elb.amazonaws.com:9000/api/v1/episodes/';
 
 class Episodes extends Component {
 

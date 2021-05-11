@@ -3,7 +3,7 @@ import '../../assets/css/Quotes.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from "axios";
 
-const url = 'http://localhost:9000/api/v1/quotes/';
+const url = 'http://ec2co-ecsel-1sdmja9tx78h6-1970409881.us-east-2.elb.amazonaws.com:9000/api/v1/quotes/';
 
 class Quotes extends Component {
 
